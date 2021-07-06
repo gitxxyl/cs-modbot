@@ -1,14 +1,12 @@
 """Main.py - runs bot."""
-import os
-
 import discord
 from discord.ext import commands
-from dotenv import load_dotenv
+from dotenv import dotenv_values
 from pretty_help import PrettyHelp
 
-load_dotenv()
-TOKEN = os.getenv("DISCORD_TOKEN")
-PREFIX = os.getenv("PREFIX")
+config = dotenv_values(".env")
+TOKEN = config["DISCORD_TOKEN"]
+PREFIX = config["PREFIX"]
 
 # create bot object
 intents = discord.Intents.default()
