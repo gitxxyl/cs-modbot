@@ -11,7 +11,7 @@ def scan():
         analysis = vt_client.scan_file(f, wait_for_completion=True)
     s = analysis.status  # scan results
 
-    if s.suspicious == s.malicious == s.harmless == 0:  # file is OK
+    if s['suspicious'] == s['malicious'] == s['harmless'] == 0:  # file is OK
         return True
     else:
         # TODO: handle sus file
