@@ -10,9 +10,9 @@ from pretty_help import PrettyHelp
 from viruscog import Virus
 from mod import Mod
 
-config = dotenv_values(".env")
-TOKEN = config["DISCORD_TOKEN"]
-PREFIX = config["PREFIX"]
+secrets = dotenv_values(".env")
+TOKEN = secrets["DISCORD_TOKEN"]
+PREFIX = secrets["PREFIX"]
 
 # create bot object
 intents = discord.Intents.default()
