@@ -8,6 +8,7 @@ from pretty_help import PrettyHelp
 
 # import other classes
 from viruscog import Virus
+from mod import Mod
 
 config = dotenv_values(".env")
 TOKEN = config["DISCORD_TOKEN"]
@@ -24,5 +25,6 @@ bot = commands.Bot(command_prefix=f"{PREFIX}",
                    case_insensitive=True)
 # add cogs here
 bot.add_cog(Virus(bot))
+bot.add_cog(Mod(bot))
 bot.run(TOKEN)
 nest_asyncio.apply()
