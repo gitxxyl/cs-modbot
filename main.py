@@ -27,4 +27,3 @@ bot = commands.Bot(command_prefix=f"{PREFIX}",
 bot.add_cog(Virus(bot))
 bot.add_cog(Mod(bot))
 bot.run(TOKEN)
-nest_asyncio.apply()
