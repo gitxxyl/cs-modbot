@@ -17,8 +17,7 @@ class Mod(commands.Cog):
 
     @commands.command(name='purge')
     async def purge(self, ctx, number: int) -> None:
-        f"""
-        {PREFIX}purge <number>
+        """
         Deletes messages from the channel that this command is run in.
         <number>: number of messages to delete
         """
