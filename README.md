@@ -6,7 +6,8 @@ Prefix for the bot is +
 
 ### Indev features:
 
--Virus scanner\r\n
+-Virus scanner
+
 -Warning function
 
 ### Planned features:
