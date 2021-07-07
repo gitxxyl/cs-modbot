@@ -1,19 +1,55 @@
-import time
-# TODO: implement vt scan in on_message with attachments
-import vt
-def scan():
-    global analysis
-    # TODO: Store virustotal API Keys in env
-    vt_key = "aafa3531e088d440658570a3059046ac7b4bb304f25f4293e25440959e0d522c" #
-    fp = ""  # filepath to test virustotal (emptied for commit)
-    vt_client = vt.Client(vt_key)  # init virustotal client
-    with open(fp, "rb") as f:
-        analysis = vt_client.scan_file(f, wait_for_completion=True)
-    s = analysis.status  # scan results
+"""Virus scanner file to scan for viruses on incoming discord messages."""
+import asyncio
 
-    if s['suspicious'] == s['malicious'] == s['harmless'] == 0:  # file is OK
-        return True
-    else:
-        # TODO: handle sus file
+import discord
+import requests
+import enum
+import hashlib
+from dotenv import dotenv_values
+
+import config
+import debug
+
+
+def gethash(fp) -> str:
+    chunksize = 65536  # process file in 64kb chunks to reduce memory usage spikes
+    hash = (getattr(hashlib, config.hashtype))()
+    currentchunk = 0
+    while currentchunk != b'':
+        currentchunk = fp.read(chunksize)
+        hash.update(currentchunk)
+
+    return hash.hexdigest()
+
+
+async def handlePositive(file, response, msg) -> None:
+    """Perform necessary tasks to deal with a virus-positive attachment."""
+    await debug.log(f"Suspicious file detected! \nAuthor: {msg.author}  \nSHA-256: {gethash(file.fp)}")
+    await msg.delete()
+
+async def scanf(file: discord.File = None, msg: discord.Message = None) -> bool:
+    """Check if"""
+    url = 'https://www.virustotal.com/vtapi/v2/file/scan'
+    params = {'apikey': dotenv_values(".env")["VT_TOKEN"], 'resource': gethash(file.fp)}
+    response = requests.get(url, params=params).json()
+    if response["response_code"] != 1:
+        response = await newscanf(file)
+    if response["positives"] >= 1:
+        await handlePositive(file=file, response=response, msg=msg)
         return False
+    else:
+        return True
+
+
+async def newscanf(file: discord.File = None) -> dict:
+    url = 'https://www.virustotal.com/vtapi/v2/file/scan'
+    files = {'file': (file.filename, file.fp)}
+    params = {'apikey': dotenv_values(".env")["VT_TOKEN"]}
+    response = requests.post(url, files=files, params=params).json()
+    while response["response_code"] == -2:
+        response = requests.post(url, files=files, params=params).json()
+        await asyncio.sleep(2)
+
+    return response
+
 
