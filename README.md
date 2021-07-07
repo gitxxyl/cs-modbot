@@ -11,3 +11,6 @@ Prefix for the bot is +
 
 ### Planned features:
 
+-Kick
+-Ban
+-Mute
