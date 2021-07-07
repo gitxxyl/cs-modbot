@@ -4,6 +4,8 @@ from discord.ext import commands
 from dotenv import dotenv_values
 from pretty_help import PrettyHelp
 
+from mod import Mod
+
 config = dotenv_values(".env")
 TOKEN = config["DISCORD_TOKEN"]
 PREFIX = config["PREFIX"]
@@ -18,4 +20,5 @@ bot = commands.Bot(command_prefix=f"{PREFIX}",
                    intents=intents,
                    case_insensitive=True)
 # add cogs here
+bot.add_cog(Mod(bot))
 bot.run(TOKEN)
