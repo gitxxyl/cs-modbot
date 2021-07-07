@@ -24,32 +24,34 @@ def gethash(fp) -> str:
 
 async def handlePositive(file, response, msg) -> None:
     """Perform necessary tasks to deal with a virus-positive attachment."""
-    await debug.log(f"Suspicious file detected! \nAuthor: {msg.author}  \nSHA-256: {gethash(file.fp)}")
+    await debug.log(f"Suspicious file detected! \n\tAuthor: {msg.author}  \n\tSHA-256: {gethash(file.fp)}\n\t{response['data']['attributes']['stats']['suspicious']} suspicious and {response['data']['attributes']['stats']['malicious']} malicious responses.")
     await msg.delete()
 
-async def scanf(file: discord.File = None, msg: discord.Message = None) -> bool:
-    """Check if"""
-    url = 'https://www.virustotal.com/vtapi/v2/file/scan'
-    params = {'apikey': dotenv_values(".env")["VT_TOKEN"], 'resource': gethash(file.fp)}
-    response = requests.get(url, params=params).json()
-    if response["response_code"] != 1:
-        response = await newscanf(file)
-    if response["positives"] >= 1:
-        await handlePositive(file=file, response=response, msg=msg)
+
+async def scanf(file: discord.File, msg: discord.Message) -> bool:
+    """Check if file is a virus."""
+    urlf = "https://www.virustotal.com/api/v3/files"
+    urla = "https://www.virustotal.com/api/v3/analyses"
+    headers = {'x-apikey': 'aafa3531e088d440658570a3059046ac7b4bb304f25f4293e25440959e0d522c'}
+    files = {'file': (file.filename, file.fp)}
+    print(urlf + str(gethash(file.fp)))
+    response = requests.get(url=urlf + f"/{gethash(file.fp)}/analyse", headers=headers)
+    if response != 200:
+        id = requests.post(url=urlf, headers=headers, files=files)
+        id = id.json()["data"]["id"]
+        await asyncio.sleep(10
+                            )
+        response = requests.get(url=urla + f"/{id}", headers=headers)
+        print(response.text)
+
+    response = response.json()
+
+    print(response)
+    if response['data']['attributes']['stats']['suspicious'] == response['data']['attributes']['stats']['malicious'] == 0:
+        await msg.clear_reaction("⌛")
+        await msg.add_reaction("✅")
         return False
     else:
+        await handlePositive(file, response, msg)
         return True
-
-
-async def newscanf(file: discord.File = None) -> dict:
-    url = 'https://www.virustotal.com/vtapi/v2/file/scan'
-    files = {'file': (file.filename, file.fp)}
-    params = {'apikey': dotenv_values(".env")["VT_TOKEN"]}
-    response = requests.post(url, files=files, params=params).json()
-    while response["response_code"] == -2:
-        response = requests.post(url, files=files, params=params).json()
-        await asyncio.sleep(2)
-
-    return response
-
 

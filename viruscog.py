@@ -12,8 +12,10 @@ class Virus(commands.Cog):
         if not msg.attachments:
             print("no attachments")
             return
+        await msg.add_reaction("⌛")
         for attachment in msg.attachments:
             await scanf(file=await attachment.to_file(), msg=msg)
+
 
     @commands.command()
     async def scan(self, ctx, url):
