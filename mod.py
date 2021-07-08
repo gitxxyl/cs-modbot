@@ -1,6 +1,6 @@
 """mod.py - file dealing with most of the moderator commands, such as kick, ban, etc."""
 import io
-
+from typing import Union
 import discord
 from discord.ext import commands
 from dotenv import dotenv_values
@@ -29,28 +29,60 @@ class Mod(commands.Cog):
         self.bot = bot
 
     @commands.command(name='purge')
-    async def purge(self, ctx, amount: int) -> None:
+    async def purge(self, ctx, amount: int, mode: str = None, param: Union[discord.Member, str] = None) -> None:
         """
         Deletes messages from the channel that this command is run in.
         <amount>: number of messages to delete
         """
-        if amount <= 0:
+        if not param and mode:
+            await ctx.send("You must specify a user or message to purge!")
+            return
+        def purge_check(m):
+            """
+            Checks if a message is under the purge request.
+            Called on discord.Channel.purge.
+            """
+            if mode[0] == "f":
+                return m.author == param
+            elif mode[0] == "w":
+                return param in m.content
+            else:
+                return True
+
+        if mode not in [None, "all", "from", "with", "a", "f", "w"]:  # validate mode input
+            await ctx.send(f"Mode {mode} does not exist!")
+            return
+        if mode is None:  # set default
+            mode = "d"
+        mode = mode[0]
+        if amount <= 0:  # negative no. of msgs
             await ctx.send("You can't delete a negative number of messages!")
             return
         try:
-            await ctx.channel.purge(limit=amount + 1)
+            await ctx.message.delete()
+            msg = []
+            async for m in ctx.channel.history():
+                if len(msg) == amount: # we have enough messages alr
+                    break
+                if purge_check(m): # if message fits requirement
+                    msg.append(m) # add message to list
+            await ctx.channel.delete_messages(msg) # delete all messages in list
+            #await ctx.channel.purge(limit=amount, check=purge_check)  # purge amt+1 msgs with purge_check
             await ctx.send(f"Purged {amount} messages.", delete_after=2)
             await self.bot.get_channel(MOD_CHANNEL).send(
                 f"User {ctx.author.name} has deleted {amount} messages in channel {ctx.channel.name}."
             )
-        except discord.Forbidden:
+
+        except discord.Forbidden as e:  # bot doesn't have deleting permissions
+            # debug.log(e)
             await ctx.send("ERROR: permissions missing.", delete_after=2)
             await ctx.send(f"Purged {amount} messages.", delete_after=2)
             await self.bot.get_channel(MOD_CHANNEL).send(
                 f"User {ctx.author.nickname} attempted to delete {amount} messages in channel {ctx.channel.name}. "
                 f"Action failed because of missing permissions."
             )
-        except discord.HTTPException:
+        except discord.HTTPException as e:  # misc discord exception
+            # debug.log(e)
             await ctx.send("ERROR: messages could not be purged.", delete_after=2)
             await self.bot.get_channel(MOD_CHANNEL).send(
                 f"User {ctx.author.nickname} attempted to delete {amount} messages in channel {ctx.channel.name}. "
@@ -80,3 +112,7 @@ class Mod(commands.Cog):
             )
         except io.UnsupportedOperation:
             await ctx.send('ERROR: warns.json is not writable')
+
+    @staticmethod
+    async def is_mod(ctx):
+        return ctx.author # TODO: check for admin
