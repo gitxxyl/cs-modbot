@@ -1,2 +1,26 @@
 coding server modbot - documentation
 
+
+Chapter 1 - program files structure
+
+main.py:
+the file that runs everything
+    -imports necassary-to-function libraries(e.g discord.py, dotenv, class files)
+    -sets token and prefix
+    -creates bot objects
+    -runs classes
+
+<add stuff here later>
+
+
+Chapter 2 - bot functions
+
+run bot functions via running bot and sending [PREFIX]<function cmd> in discord
+
+Mod cog:
+moderator functions
+
+    warn
+
+antivirus cog:
+antivirus functions
