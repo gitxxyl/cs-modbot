@@ -1,4 +1,5 @@
 coding server modbot - documentation
+based on the main branch
 
 
 Chapter 1 - program files structure
@@ -16,11 +17,16 @@ the file that runs everything
 Chapter 2 - bot functions
 
 run bot functions via running bot and sending [PREFIX]<function cmd> in discord
+if func has * to the left, func is background function that was given a name for documentation purposes
 
 Mod cog:
 moderator functions
 
-    warn
+    purge <delamt>
+    deletes the previous <delamt> number of messages in the channel the command was sent
 
 antivirus cog:
 antivirus functions
+
+*   scan
+    scans files that are sent in the server for malicious code
