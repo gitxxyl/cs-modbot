@@ -18,7 +18,7 @@ def gethash(fp) -> str:
     while currentchunk != b'':
         currentchunk = fp.read(chunksize)
         hash.update(currentchunk)
-
+    fp.seek(0)
     return hash.hexdigest()
 
 
@@ -34,19 +34,13 @@ async def scanf(file: discord.File, msg: discord.Message) -> bool:
     urla = "https://www.virustotal.com/api/v3/analyses"
     headers = {'x-apikey': 'aafa3531e088d440658570a3059046ac7b4bb304f25f4293e25440959e0d522c'}
     files = {'file': (file.filename, file.fp)}
-    print(urlf + str(gethash(file.fp)))
-    response = requests.get(url=urlf + f"/{gethash(file.fp)}/analyse", headers=headers)
-    if response != 200:
-        id = requests.post(url=urlf, headers=headers, files=files)
-        id = id.json()["data"]["id"]
-        await asyncio.sleep(10
-                            )
+    hash = str(gethash(file.fp))
+    response = requests.get(url=urlf + f"/{hash}/analyse", headers=headers)
+    while response.status_code != 200:
+        id = requests.post(url=urlf, headers=headers, files=files).json()["data"]["id"]
+        await asyncio.sleep(10)
         response = requests.get(url=urla + f"/{id}", headers=headers)
-        print(response.text)
-
     response = response.json()
-
-    print(response)
     if response['data']['attributes']['stats']['suspicious'] == response['data']['attributes']['stats']['malicious'] == 0:
         await msg.clear_reaction("⌛")
         await msg.add_reaction("✅")
