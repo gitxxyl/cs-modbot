@@ -33,6 +33,14 @@ class Mod(commands.Cog):
         """
         Deletes messages from the channel that this command is run in.
         <amount>: number of messages to delete
+        === MODES ===
+        all: no check is applied
+        from: deletes messages from a user only
+        with: deletes messages containing a phrase
+        === OPTIONAL ===
+        [mode]: mode of purging messages. must be one of all, from, with
+        [param]: if mode is from, param should be id/username/mention of a user.
+                 if mode is with, param should be a string in quotes containing the phrase.
         """
         if not param and mode:
             await ctx.send("You must specify a user or message to purge!")
@@ -94,7 +102,8 @@ class Mod(commands.Cog):
         """
         Warns a user with an optional reason.
         <user>: id/username of user to warn
-        <reason>: optional reason for warn
+        === OPTIONAL ===
+        [reason]: reason for warn
         """
         # await ctx.send(user.display_name)
         # await ctx.send(' '.join(reason) if len(reason) else 'none given')
@@ -115,4 +124,4 @@ class Mod(commands.Cog):
 
     @staticmethod
     async def is_mod(ctx):
-        return ctx.author # TODO: check for admin
+        return bool(ctx.author.server_permissions.administrator)
