@@ -1,14 +1,18 @@
 """Main.py - runs bot."""
+
+# import external libraries
 import discord
 from discord.ext import commands
 from dotenv import dotenv_values
 from pretty_help import PrettyHelp
 
+# import other classes
+from viruscog import Virus
 from mod import Mod
 
-config = dotenv_values(".env")
-TOKEN = config["DISCORD_TOKEN"]
-PREFIX = config["PREFIX"]
+secrets = dotenv_values(".env")
+TOKEN = secrets["DISCORD_TOKEN"]
+PREFIX = secrets["PREFIX"]
 
 # create bot object
 intents = discord.Intents.default()
@@ -20,5 +24,6 @@ bot = commands.Bot(command_prefix=f"{PREFIX}",
                    intents=intents,
                    case_insensitive=True)
 # add cogs here
+bot.add_cog(Virus(bot))
 bot.add_cog(Mod(bot))
 bot.run(TOKEN)

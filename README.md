@@ -1,10 +1,16 @@
 # cs-modbot
-A moderator bot for Coding Server.
+A moderator bot for Coding Server.  
 created from ashes of the british empire
 
+Prefix for the bot is +
+
+### Indev features:
+
+-Virus scanner  
+-Warning function
 
 ### Planned features:
 
-scan exe files for virus
-
-Prefix for the bot is +
+-Kick  
+-Ban  
+-Mute
