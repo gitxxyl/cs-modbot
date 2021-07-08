@@ -8,7 +8,7 @@ def start(client):
     global file, bot
     bot = client
     dt = datetime.datetime.today()
-    file = open(f"CS-MODBOT Logog-{dt.day}-{dt.month}-{dt.year}.log", "a")  # load log file on import into main
+    file = open(f"CS-MODBOT Log-{dt.day}-{dt.month}-{dt.year}.log", "a")  # load log file on import into main
 
 
 async def log(log):
