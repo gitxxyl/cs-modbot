@@ -7,7 +7,11 @@ from virusscanner import scanf
 
 
 class Virus(commands.Cog):
-
+    """
+    Cog for antivirus features.
+    Contains a message listener to scan attachments automatically.
+    Instance of commands.Cog.
+    """
     def __init__(self, bot):
         self.bot = bot
 
@@ -28,9 +32,3 @@ class Virus(commands.Cog):
                 await msg.add_reaction("⌛")
                 if await scanf(file=await attachment.to_file(), msg=msg):
                     await msg.channel.send(f"I smell malicious code... {msg.author.mention} is that you?")
-
-
-    @commands.command()
-    async def scan(self, ctx, url):
-        pass
-
