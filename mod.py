@@ -20,7 +20,7 @@ PREFIX = os.getenv("PREFIX")
 
 MOD_CHANNEL = int(os.getenv("MOD_CHANNEL"))
 
-WARNS_PATH = 'C:/Users/ragha/PycharmProjects/cs-modbot/warns.json'
+WARNS_PATH = 'warns.json'
 with open(WARNS_PATH) as j:
     warns = defaultdict(lambda: defaultdict(lambda: []), json.load(j))
     print(type(warns))
