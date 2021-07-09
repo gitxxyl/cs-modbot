@@ -1,4 +1,9 @@
-"""mod.py - file dealing with most of the moderator commands, such as kick, ban, etc."""
+"""
+**mod.py**\n
+
+Cog for moderation related commands and listeners - such as warn, kick and purge.\n
+|
+"""
 import io
 from typing import Union
 import json
@@ -6,15 +11,16 @@ from collections import defaultdict
 import secrets
 import discord
 from discord.ext import commands
-from dotenv import dotenv_values
+from dotenv import load_dotenv
+import os
 
-config = dotenv_values(".env")
-TOKEN = config["DISCORD_TOKEN"]
-PREFIX = config["PREFIX"]
+load_dotenv()
+TOKEN = os.getenv("DISCORD_TOKEN")
+PREFIX = os.getenv("PREFIX")
 
-MOD_CHANNEL = int(config["MOD_CHANNEL"])
+MOD_CHANNEL = int(os.getenv("MOD_CHANNEL"))
 
-WARNS_PATH = 'warns.json'
+WARNS_PATH = 'C:/Users/ragha/PycharmProjects/cs-modbot/warns.json'
 with open(WARNS_PATH) as j:
     warns = defaultdict(lambda: defaultdict(lambda: []), json.load(j))
     print(type(warns))
@@ -22,7 +28,8 @@ with open(WARNS_PATH) as j:
 class Mod(commands.Cog):
     """
     Cog that deals with the main mod commands, like
-    purge, mute, ban, warn, kick, and etc.
+    purge, mute, ban, warn, kick, and etc.\n
+    |
     """
 
     def __init__(self, bot) -> None:
@@ -49,7 +56,8 @@ class Mod(commands.Cog):
         === OPTIONAL ===
         [mode]: mode of purging messages. must be one of all, from, with
         [param]: if mode is from, param should be id/username/mention of a user.
-                 if mode is with, param should be a string in quotes containing the phrase.
+                 if mode is with, param should be a string in quotes containing the phrase.\n
+        |
         """
         if not param and mode:
             await ctx.send("You must specify a user or message to purge!")
@@ -57,7 +65,8 @@ class Mod(commands.Cog):
         def purge_check(msg):
             """
             Checks if a message is under the purge request.
-            Called on discord.Channel.purge.
+            Called on discord.Channel.purge.\n
+            |
             """
             if mode[0] == "f":
                 return msg.author == param
@@ -116,7 +125,8 @@ class Mod(commands.Cog):
         :param err:
         :return:
 
-        Deals with errors where user does not have admin permissions
+        Deals with errors where user does not have admin permissions.\n
+        |
         """
         if isinstance(err, commands.MissingPermissions):
             print("missing admin perms")
@@ -129,7 +139,8 @@ class Mod(commands.Cog):
         Warns a user with an optional reason.
         <user>: id/username of user to warn
         === OPTIONAL ===
-        [reason]: reason for warn
+        [reason]: reason for warn\n
+        |
         """
         # await ctx.send(user.display_name)
         # await ctx.send(' '.join(reason) if len(reason) else 'none given')
@@ -156,7 +167,8 @@ class Mod(commands.Cog):
         :param err:
         :return:
 
-        Deals with errors where user does not have admin permissions
+        Deals with errors where user does not have admin permissions\n
+        |
         """
         if isinstance(err, commands.MissingPermissions):
             print("missing admin perms")

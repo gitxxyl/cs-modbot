@@ -1,4 +1,8 @@
-"""Virus scanner file to scan for viruses on incoming discord messages."""
+"""
+**virusscanner.py**\n
+Virus scanner file to scan for viruses on incoming discord messages. \n
+|
+"""
 import typing
 
 import discord
@@ -17,7 +21,8 @@ def gethash(fp: typing.IO) -> str:
     :param fp: File-like object to be hashed. Can be any readable object.
     :type fp: typing.IO
     :return: Returns hash of object as a hex string.
-    :rtype: str
+    :rtype: str \n
+    |
     """
     chunksize = 65536  # process file in 64kb chunks to reduce memory usage spikes
     hsh = (getattr(hashlib, config.hashtype))()  # use hashtype specified in config file
@@ -39,8 +44,10 @@ async def handlePositive(file: discord.File, response: dict, msg: discord.Messag
     :type msg: discord.Message
     :param response: VirusTotal API response. JSON.
     :type response: dict
+
     :return: None
-    :rtype: None
+    :rtype: None \n
+    |
     """
     await debug.log(  # Logs malicious file detection
         f"Suspicious file detected! \n\tAuthor: {msg.author}  \n\tSHA-256: {gethash(file.fp)}\n\t{response['data']['attributes']['stats']['suspicious']} suspicious and {response['data']['attributes']['stats']['malicious']} malicious responses.")
@@ -55,8 +62,10 @@ async def scanf(file: discord.File, msg: discord.Message) -> bool:
     :type file: discord.File
     :param msg: Original message with file attachment. Instance of discord.Message.
     :type msg: discord.Message
-    :return: Returns a bool - True if virus found, False if not found.
-    :rtype: bool
+
+    :return: Returns True if virus found, False if not found.
+    :rtype: bool \n
+    |
     """
 
     # REST arguments

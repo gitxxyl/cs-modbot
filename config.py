@@ -1,4 +1,8 @@
-"""Global variables to modify"""
+"""
+**config.py** \n
+Global variables to modify\n
+|
+"""
 
 chunksize = 65536
 hashtype = "sha256"
