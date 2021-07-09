@@ -24,6 +24,7 @@ moderator functions
 
     purge <delamt>
     deletes the previous <delamt> number of messages in the channel the command was sent
+    warn
 
 antivirus cog:
 antivirus functions

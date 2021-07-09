@@ -1,12 +1,12 @@
 """mod.py - file dealing with most of the moderator commands, such as kick, ban, etc."""
 import io
 from typing import Union
+import json
+from collections import defaultdict
+import secrets
 import discord
 from discord.ext import commands
 from dotenv import dotenv_values
-import json
-import secrets
-from collections import defaultdict
 
 config = dotenv_values(".env")
 TOKEN = config["DISCORD_TOKEN"]
@@ -16,8 +16,8 @@ MOD_CHANNEL = int(config["MOD_CHANNEL"])
 
 WARNS_PATH = 'warns.json'
 with open(WARNS_PATH) as j:
-    warns = defaultdict(lambda: {}, json.load(j))
-
+    warns = defaultdict(lambda: defaultdict(lambda: []), json.load(j))
+    print(type(warns))
 
 class Mod(commands.Cog):
     """
@@ -28,8 +28,17 @@ class Mod(commands.Cog):
     def __init__(self, bot) -> None:
         self.bot = bot
 
+    # @commands.Cog.listener()
+    # async def on_message(self, ctx) -> None:
+    #     if not ctx.author.guild_permissions.administrator:
+    #         await ctx.send("Sorry, you don't have the permissions to do this!")
+    #         return
+    #     await self.bot.process_commands(ctx)
+
+    @commands.has_permissions(administrator=True)
     @commands.command(name='purge')
-    async def purge(self, ctx, amount: int, mode: str = None, param: Union[discord.Member, str] = None) -> None:
+    async def purge(self, ctx, amount: int, mode: str = None,
+                    param: Union[discord.Member, str] = None) -> None:
         """
         Deletes messages from the channel that this command is run in.
         <amount>: number of messages to delete
@@ -45,17 +54,16 @@ class Mod(commands.Cog):
         if not param and mode:
             await ctx.send("You must specify a user or message to purge!")
             return
-        def purge_check(m):
+        def purge_check(msg):
             """
             Checks if a message is under the purge request.
             Called on discord.Channel.purge.
             """
             if mode[0] == "f":
-                return m.author == param
-            elif mode[0] == "w":
-                return param in m.content
-            else:
-                return True
+                return msg.author == param
+            if mode[0] == "w":
+                return param in msg.content
+            return True
 
         if mode not in [None, "all", "from", "with", "a", "f", "w"]:  # validate mode input
             await ctx.send(f"Mode {mode} does not exist!")
@@ -68,35 +76,53 @@ class Mod(commands.Cog):
             return
         try:
             await ctx.message.delete()
-            msg = []
-            async for m in ctx.channel.history():
-                if len(msg) == amount: # we have enough messages alr
+            msg_list = []
+            async for msg in ctx.channel.history():
+                if len(msg_list) == amount: # we have enough messages alr
                     break
-                if purge_check(m): # if message fits requirement
-                    msg.append(m) # add message to list
-            await ctx.channel.delete_messages(msg) # delete all messages in list
-            #await ctx.channel.purge(limit=amount, check=purge_check)  # purge amt+1 msgs with purge_check
+                if purge_check(msg): # if message fits requirement
+                    msg_list.append(msg) # add message to list
+            await ctx.channel.delete_messages(msg_list) # delete all messages in list
+            # purge amt+1 msgs with purge_check
+            # await ctx.channel.purge(limit=amount, check=purge_check)
             await ctx.send(f"Purged {amount} messages.", delete_after=2)
             await self.bot.get_channel(MOD_CHANNEL).send(
-                f"User {ctx.author.name} has deleted {amount} messages in channel {ctx.channel.name}."
+                f"User {ctx.author.name} has deleted {amount} messages"
+                f"in channel {ctx.channel.name}."
             )
 
-        except discord.Forbidden as e:  # bot doesn't have deleting permissions
+        except discord.Forbidden:  # bot doesn't have deleting permissions
             # debug.log(e)
             await ctx.send("ERROR: permissions missing.", delete_after=2)
             await ctx.send(f"Purged {amount} messages.", delete_after=2)
             await self.bot.get_channel(MOD_CHANNEL).send(
-                f"User {ctx.author.nickname} attempted to delete {amount} messages in channel {ctx.channel.name}. "
+                f"User {ctx.author.nickname} attempted to delete "
+                f"{amount} messages in channel {ctx.channel.name}. "
                 f"Action failed because of missing permissions."
             )
-        except discord.HTTPException as e:  # misc discord exception
+        except discord.HTTPException:  # misc discord exception
             # debug.log(e)
             await ctx.send("ERROR: messages could not be purged.", delete_after=2)
             await self.bot.get_channel(MOD_CHANNEL).send(
-                f"User {ctx.author.nickname} attempted to delete {amount} messages in channel {ctx.channel.name}. "
+                f"User {ctx.author.nickname} attempted to delete "
+                f"{amount} messages in channel {ctx.channel.name}. "
                 f"Action failed because of HTTPException."
             )
 
+    @purge.error
+    async def purge_error(self, ctx, err):
+        """
+        :param ctx:
+        :param err:
+        :return:
+
+        Deals with errors where user does not have admin permissions
+        """
+        if isinstance(err, commands.MissingPermissions):
+            print("missing admin perms")
+            await ctx.send("You don't have the permission to do this!")
+
+    @commands.has_permissions(administrator=True)
     @commands.command(name='warn')
     async def warn(self, ctx, user: discord.Member, *reason) -> None:
         """
@@ -109,10 +135,11 @@ class Mod(commands.Cog):
         # await ctx.send(' '.join(reason) if len(reason) else 'none given')
         try:
             warn_id = secrets.token_hex(4)
-            warns[user.id][warn_id] = reason
-            with open(WARNS_PATH, 'w', encoding='utf-8') as f:
-                json.dump(warns, f, ensure_ascii=False, indent=4)
-            embed = discord.Embed(title=f":white_check_mark: {user.name} has been warned. (TESTING)")
+            warns[user.id][warn_id].append(reason)
+            with open(WARNS_PATH, 'w',
+                      encoding='utf-8') as file:
+                json.dump(warns, file, ensure_ascii=False, indent=4)
+            embed = discord.Embed(title=f":white_check_mark: {user.name} has been warned.")
             embed.add_field(name="Reason:", value=f"{' '.join(reason)}", inline=False)
             embed.add_field(name="ID:", value=f"{warn_id}")
             await ctx.send(embed=embed)
@@ -122,6 +149,19 @@ class Mod(commands.Cog):
         except io.UnsupportedOperation:
             await ctx.send('ERROR: warns.json is not writable')
 
-    @staticmethod
-    async def is_mod(ctx):
-        return bool(ctx.author.server_permissions.administrator)
+    @warn.error
+    async def warn_error(self, ctx, err):
+        """
+        :param ctx:
+        :param err:
+        :return:
+
+        Deals with errors where user does not have admin permissions
+        """
+        if isinstance(err, commands.MissingPermissions):
+            print("missing admin perms")
+            await ctx.send("You don't have the permission to do this!")
+    # optional function to check if message author has admin perms
+    # @staticmethod
+    # async def is_mod(ctx):
+    #     return bool(ctx.author.server_permissions.administrator)
