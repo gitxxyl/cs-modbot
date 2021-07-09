@@ -17,7 +17,7 @@ PREFIX = secrets["PREFIX"]
 
 # create bot object
 intents = discord.Intents.default()
-intents.members = True  # to access members
+# intents.members = True  # to access members
 bot = commands.Bot(command_prefix=f"{PREFIX}",
                    help_command=PrettyHelp(color=discord.colour.Colour.blurple(),
                                            show_index=False,
