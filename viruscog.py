@@ -1,4 +1,5 @@
 from discord.ext import commands
+import discord
 
 import config
 import debug
@@ -11,7 +12,14 @@ class Virus(commands.Cog):
         self.bot = bot
 
     @commands.Cog.listener()
-    async def on_message(self, msg) -> None:
+    async def on_message(self, msg: discord.Message) -> None:
+        """
+        Checks for attachments on every message to scan appropriate files.
+        :param msg: Message to be checked and scanned.
+        :type msg: discord.Message
+        :return: None
+        :rtype: None
+        """
         if not msg.attachments:
             return
         for attachment in msg.attachments:
