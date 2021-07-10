@@ -97,7 +97,7 @@ class Mod(commands.Cog):
             # await ctx.channel.purge(limit=amount, check=purge_check)
             await ctx.send(f"Purged {amount} messages.", delete_after=2)
             await self.bot.get_channel(MOD_CHANNEL).send(
-                f"User {ctx.author.name} has deleted {amount} messages"
+                f"User {ctx.author.name} has deleted {amount} messages "
                 f"in channel {ctx.channel.name}."
             )
 
