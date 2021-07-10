@@ -20,7 +20,7 @@ def start(client: commands.Bot) -> None:
     bot = client
     dt = datetime.datetime.today()
     # load log_message file on start
-    file = open(f"CS-MODBOT Log-{dt.day}-{dt.month}-{dt.year}.log_message", "a")
+    file = open(f"../data/CS-MODBOT Log-{dt.day}-{dt.month}-{dt.year}.log_message", "a")
 
 
 async def log(log_message: str) -> None:

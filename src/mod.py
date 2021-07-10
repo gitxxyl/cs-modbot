@@ -13,6 +13,8 @@ import discord
 from discord.ext import commands
 from dotenv import load_dotenv
 import os
+import config
+
 
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
@@ -20,7 +22,7 @@ PREFIX = config.prefix
 
 MOD_CHANNEL = config.debug_channel_id
 
-WARNS_PATH = 'warns.json'
+WARNS_PATH = '../data/warns.json'
 with open(WARNS_PATH) as j:
     warns = defaultdict(lambda: defaultdict(lambda: []), json.load(j))
     # print(type(warns))
