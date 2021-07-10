@@ -106,7 +106,7 @@ class Mod(commands.Cog):
             await ctx.send("ERROR: permissions missing.", delete_after=2)
             await ctx.send(f"Purged {amount} messages.", delete_after=2)
             await self.bot.get_channel(MOD_CHANNEL).send(
-                f"User {ctx.author.nickname} attempted to delete "
+                f"User {ctx.author.display_name} attempted to delete "
                 f"{amount} messages in channel {ctx.channel.name}. "
                 f"Action failed because of missing permissions."
             )
@@ -114,7 +114,7 @@ class Mod(commands.Cog):
             # debug.log(e)
             await ctx.send("ERROR: messages could not be purged.", delete_after=2)
             await self.bot.get_channel(MOD_CHANNEL).send(
-                f"User {ctx.author.nickname} attempted to delete "
+                f"User {ctx.author.display_name} attempted to delete "
                 f"{amount} messages in channel {ctx.channel.name}. "
                 f"Action failed because of HTTPException."
             )
@@ -178,6 +178,70 @@ class Mod(commands.Cog):
         if isinstance(err, commands.MissingPermissions):
             print("missing admin perms")
             await ctx.send("You don't have the permission to do this!")
+        elif isinstance(err, commands.MemberNotFound):
+            print('no member found')
+            await ctx.send(err)
+
+    @commands.has_permissions(administrator=True)
+    @commands.command(name='kick')
+    async def kick(self, ctx, user: discord.Member, *reason) -> None:
+        """
+        Kicks a user with an optional reason.
+        <user>: id/username of user to warn
+        === OPTIONAL ===
+        [reason]: reason for warn\n
+        |
+        """
+        try:
+            reason_for_kick = ' '.join(reason)
+            if reason_for_kick == "":
+                reason_for_kick = "\u200c"
+                optionals = ""
+            else:
+                optionals = " for "
+            await user.kick()
+            embed = discord.Embed(title=f":white_check_mark: {user.name} has been kicked.")
+            embed.add_field(name="Reason:", value=f"{reason_for_kick}", inline=False)
+            await ctx.send(f"Kicked {user.display_name}", embed=embed)
+            await self.bot.get_channel(MOD_CHANNEL).send(
+                f"User {ctx.author.display_name} kicked "
+                f"{user.display_name} in channel {ctx.channel.name}. "
+                f"Reason: ```{reason_for_kick}```"
+            )
+            await user.send(f"You just got kicked{optionals}{reason_for_kick}!",
+                            allowed_mentions=discord.AllowedMentions.none())
+        except discord.Forbidden:
+            await ctx.send("ERROR: permissions missing.", delete_after=2)
+            await self.bot.get_channel(MOD_CHANNEL).send(
+                f"User {ctx.author.display_name} attempted to kick "
+                f"{user.display_name} in channel {ctx.channel.name}. "
+                "Action failed because the bot does not have permissions to kick members, "
+                "or bot is too low in role hierarchy. "
+            )
+        except discord.HTTPException as e:
+            await ctx.send("ERROR: permissions missing.", delete_after=2)
+            await self.bot.get_channel(MOD_CHANNEL).send(
+                f"User {ctx.author.display_name} attempted to kick "
+                f"{user.display_name} in channel {ctx.channel.name}. "
+                "Action failed because of HTTPException. "
+            )
+
+    @kick.error
+    async def kick_error(self, ctx, err):
+        """
+        :param ctx:
+        :param err:
+        :return:
+        Deals with errors where user does not have admin permissions\n
+        |
+        """
+        if isinstance(err, commands.MissingPermissions):
+            print("missing admin perms")
+            await ctx.send("You don't have the permission to do this!")
+        elif isinstance(err, commands.MemberNotFound):
+            print('no member found')
+            await ctx.send(err)
+
     # optional function to check if message author has admin perms
     # @staticmethod
     # async def is_mod(ctx):

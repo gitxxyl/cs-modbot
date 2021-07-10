@@ -80,7 +80,7 @@ async def scanf(file: discord.File, msg: discord.Message) -> bool:
     # Upload file and get virus analysis
     while response.status_code != 200:  # run until no HTTPS errors
         analysis_id = requests.post(url=urlf, headers=headers, files=files).json()["data"]["id"]
-        # await asyncio.sleep(10)  # was neeeded to limit public API calls, now obsolete
+        # await asyncio.sleep(10)  # was needed to limit public API calls, now obsolete
         response = requests.get(url=urla + f"/{analysis_id}", headers=headers)
 
     response = response.json()  # convert HTTPS response to json to process
