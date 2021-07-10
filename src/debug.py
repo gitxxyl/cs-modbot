@@ -1,3 +1,8 @@
+"""
+**debug.py**\n
+Contains commands for debugging - e.g. custom logger.
+"""
+
 import datetime
 from discord.ext import commands
 

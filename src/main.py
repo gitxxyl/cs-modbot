@@ -35,6 +35,7 @@ from pretty_help import PrettyHelp
 import debug
 from viruscog import Virus
 from mod import Mod
+import config
 
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")

@@ -2,7 +2,6 @@
 **mod.py**\n
 
 Cog for moderation related commands and listeners - such as warn, kick and purge.\n
-|
 """
 import io
 from typing import Union
@@ -31,7 +30,6 @@ class Mod(commands.Cog):
     """
     Cog that deals with the main mod commands, like
     purge, mute, ban, warn, kick, and etc.\n
-    |
     """
 
     def __init__(self, bot) -> None:

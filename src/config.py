@@ -1,7 +1,6 @@
 """
 **config.py** \n
 Global variables to modify\n
-|
 """
 prefix = "+"
 chunksize = 65536

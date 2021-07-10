@@ -1,7 +1,6 @@
 """
 **virusscanner.py**\n
 Virus scanner file to scan for viruses on incoming discord messages. \n
-|
 """
 import typing
 

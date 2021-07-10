@@ -1,7 +1,6 @@
 """
 **viruscog.py** \n
 Cog for antivirus-related commands and listeners. \n
-|
 """
 from discord.ext import commands
 import discord
@@ -16,7 +15,6 @@ class Virus(commands.Cog):
     Cog for antivirus features.
     Contains a message listener to scan attachments automatically.
     Instance of commands.Cog. \n
-    |
     """
     def __init__(self, bot):
         self.bot = bot
