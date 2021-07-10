@@ -38,7 +38,7 @@ from mod import Mod
 
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
-PREFIX = os.getenv("PREFIX")
+PREFIX = config.prefix
 
 
 # create bot object
