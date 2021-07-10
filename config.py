@@ -3,7 +3,7 @@
 Global variables to modify\n
 |
 """
-
+prefix = "+"
 chunksize = 65536
 hashtype = "sha256"
 debug_channel_id = 760821484825739274
