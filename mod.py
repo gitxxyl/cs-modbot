@@ -16,7 +16,7 @@ import os
 
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
-PREFIX = os.getenv("PREFIX")
+PREFIX = config.prefix
 
 MOD_CHANNEL = config.debug_channel_id
 
