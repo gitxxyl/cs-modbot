@@ -1,6 +1,5 @@
 """
 **mod.py**\n
-
 Cog for moderation related commands and listeners - such as warn, kick and purge.\n
 """
 import io
@@ -21,10 +20,11 @@ PREFIX = config.prefix
 
 MOD_CHANNEL = config.debug_channel_id
 
-WARNS_PATH = os.path.abspath('data/warns.json')
+WARNS_PATH = os.path.abspath('../data/warns.json')
 with open(WARNS_PATH) as j:
     warns = defaultdict(lambda: defaultdict(lambda: []), json.load(j))
     # print(type(warns))
+
 
 class Mod(commands.Cog):
     """
@@ -62,16 +62,17 @@ class Mod(commands.Cog):
         if not param and mode:
             await ctx.send("You must specify a user or message to purge!")
             return
-        def purge_check(msg):
+
+        def purge_check(discordmsg):
             """
             Checks if a message is under the purge request.
             Called on discord.Channel.purge.\n
             |
             """
             if mode[0] == "f":
-                return msg.author == param
+                return discordmsg.author == param
             if mode[0] == "w":
-                return param in msg.content
+                return param in discordmsg.content
             return True
 
         if mode not in [None, "all", "from", "with", "a", "f", "w"]:  # validate mode input
@@ -87,11 +88,11 @@ class Mod(commands.Cog):
             await ctx.message.delete()
             msg_list = []
             async for msg in ctx.channel.history():
-                if len(msg_list) == amount: # we have enough messages alr
+                if len(msg_list) == amount:  # we have enough messages alr
                     break
-                if purge_check(msg): # if message fits requirement
-                    msg_list.append(msg) # add message to list
-            await ctx.channel.delete_messages(msg_list) # delete all messages in list
+                if purge_check(msg):  # if message fits requirement
+                    msg_list.append(msg)  # add message to list
+            await ctx.channel.delete_messages(msg_list)  # delete all messages in list
             # purge amt+1 msgs with purge_check
             # await ctx.channel.purge(limit=amount, check=purge_check)
             await ctx.send(f"Purged {amount} messages.", delete_after=2)
@@ -124,7 +125,6 @@ class Mod(commands.Cog):
         :param ctx:
         :param err:
         :return:
-
         Deals with errors where user does not have admin permissions.\n
         |
         """
@@ -146,6 +146,12 @@ class Mod(commands.Cog):
         # await ctx.send(' '.join(reason) if len(reason) else 'none given')
         try:
             warn_id = secrets.token_hex(4)
+            used_up_warn_ids = []
+            for key in warns:
+                for item in list(warns[key].keys()):
+                    used_up_warn_ids.append(item)
+            while warn_id in used_up_warn_ids:
+                warn_id = secrets.token_hex(4)
             warns[user.id][warn_id].append(reason)
             with open(WARNS_PATH, 'w',
                       encoding='utf-8') as file:
@@ -166,7 +172,6 @@ class Mod(commands.Cog):
         :param ctx:
         :param err:
         :return:
-
         Deals with errors where user does not have admin permissions\n
         |
         """
