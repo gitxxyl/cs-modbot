@@ -18,12 +18,12 @@ load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
 PREFIX = os.getenv("PREFIX")
 
-MOD_CHANNEL = int(os.getenv("MOD_CHANNEL"))
+MOD_CHANNEL = config.debug_channel_id
 
 WARNS_PATH = 'warns.json'
 with open(WARNS_PATH) as j:
     warns = defaultdict(lambda: defaultdict(lambda: []), json.load(j))
-    print(type(warns))
+    # print(type(warns))
 
 class Mod(commands.Cog):
     """
