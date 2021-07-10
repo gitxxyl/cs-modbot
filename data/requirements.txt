@@ -1,9 +1,0 @@
-discord
-python-dotenv
-sphinx
-requests
-hashlib
-typing
-setuptools
-os
-sys
