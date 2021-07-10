@@ -1,12 +1,13 @@
 coding server modbot - documentation
 based on the main branch
 
+This file is deprecated. The respective documentation is in the function's docstring.
 
 Chapter 1 - program files structure
 
 main.py:
 the file that runs everything
-    -imports necassary-to-function libraries(e.g discord.py, dotenv, class files)
+    -imports necessary-to-function libraries(e.g discord.py, dotenv, class files)
     -sets token and prefix
     -creates bot objects
     -runs classes
@@ -22,9 +23,17 @@ if func has * to the left, func is background function that was given a name for
 Mod cog:
 moderator functions
 
-    purge <delamt>
+    purge <delamt> <from/with/all> <parameter>
     deletes the previous <delamt> number of messages in the channel the command was sent
-    warn
+    <delamt> is a positive integer
+    <from/with/all> is optional, defaults to all
+    <parameter>
+    if mode is from, param should be id/username/mention of a user.
+    if mode is with, param should be a string in quotes containing the phrase.
+    if mode is all/not specified, this should be omitted.
+    warn <user> <reason>
+    <user> should be a discord member to warn
+    <reason> is a string explaining why the warn was applied
 
 antivirus cog:
 antivirus functions
