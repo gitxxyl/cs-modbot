@@ -21,7 +21,7 @@ PREFIX = config.prefix
 
 MOD_CHANNEL = config.debug_channel_id
 
-WARNS_PATH = os.path.abspath('data/warns.json') #
+WARNS_PATH = os.path.abspath('data/warns.json')
 with open(WARNS_PATH) as j:
     warns = defaultdict(lambda: defaultdict(lambda: []), json.load(j))
     # print(type(warns))
