@@ -199,7 +199,9 @@ class Mod(commands.Cog):
                 optionals = ""
             else:
                 optionals = " for "
-            await user.kick()
+            await user.send(f"You just got kicked{optionals}{reason_for_kick}!",
+                            allowed_mentions=discord.AllowedMentions.none())
+            await user.kick(reason=reason_for_kick)
             embed = discord.Embed(title=f":white_check_mark: {user.name} has been kicked.")
             embed.add_field(name="Reason:", value=f"{reason_for_kick}", inline=False)
             await ctx.send(f"Kicked {user.display_name}", embed=embed)
@@ -210,7 +212,8 @@ class Mod(commands.Cog):
             )
             await user.send(f"You just got kicked{optionals}{reason_for_kick}!",
                             allowed_mentions=discord.AllowedMentions.none())
-        except discord.Forbidden:
+        except discord.Forbidden as e:
+            await user.send('I tried to kick you but failed.')
             await ctx.send("ERROR: permissions missing.", delete_after=2)
             await self.bot.get_channel(MOD_CHANNEL).send(
                 f"User {ctx.author.display_name} attempted to kick "
@@ -218,7 +221,8 @@ class Mod(commands.Cog):
                 "Action failed because the bot does not have permissions to kick members, "
                 "or bot is too low in role hierarchy. "
             )
-        except discord.HTTPException as e:
+        except discord.HTTPException:
+            await user.send('I tried to kick you but failed.')
             await ctx.send("ERROR: permissions missing.", delete_after=2)
             await self.bot.get_channel(MOD_CHANNEL).send(
                 f"User {ctx.author.display_name} attempted to kick "
