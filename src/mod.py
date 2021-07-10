@@ -7,10 +7,10 @@ from typing import Union
 import json
 from collections import defaultdict
 import secrets
+import os
 import discord
 from discord.ext import commands
 from dotenv import load_dotenv
-import os
 import config
 
 

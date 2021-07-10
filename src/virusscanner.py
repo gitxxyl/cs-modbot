@@ -3,10 +3,10 @@
 Virus scanner file to scan for viruses on incoming discord messages. \n
 """
 import typing
+import hashlib
 
 import discord
 import requests
-import hashlib
 from dotenv import dotenv_values
 
 import config
@@ -75,7 +75,7 @@ async def scanf(file: discord.File, msg: discord.Message) -> bool:
     hsh = gethash(file.fp)  # SHA-256 hash of file to be uploaded
 
     response = requests.get(url=urlf + f"/{hsh}/analyse",
-                            headers=headers)  # try fetching existing file analysis from vt (mostly fails)
+                            headers=headers)  # fetch existing file analysis from vt (mostly fails)
 
     # Upload file and get virus analysis
     while response.status_code != 200:  # run until no HTTPS errors
@@ -90,6 +90,6 @@ async def scanf(file: discord.File, msg: discord.Message) -> bool:
         await msg.clear_reaction("⌛")
         await msg.add_reaction("✅")
         return False
-    else:  # malware detected by at least one AV provider
-        await handlePositive(file, response, msg)
-        return True
+    # malware detected by at least one AV provider
+    await handlePositive(file, response, msg)
+    return True
