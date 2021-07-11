@@ -195,11 +195,8 @@ class Mod(commands.Cog):
         try:
             reason_for_kick = ' '.join(reason)
             if reason_for_kick == "":
-                reason_for_kick = "\u200c"
-                optionals = ""
-            else:
-                optionals = "\nReason: "
-            await user.send(f"You just got kicked from coding server!{optionals}{reason_for_kick}!",
+                reason_for_kick = "No reason provided."
+            await user.send(f"You just got kicked from coding server! Reason: {reason_for_kick}.",
                             allowed_mentions=discord.AllowedMentions.none())
             await user.kick(reason=reason_for_kick)
             embed = discord.Embed(title=f":white_check_mark: {user.name} has been kicked.")
@@ -262,11 +259,8 @@ class Mod(commands.Cog):
                 return
             reason_for_ban = ' '.join(reason)
             if reason_for_ban == "":
-                reason_for_ban = "\u200c"
-                optionals = ""
-            else:
-                optionals = "\nReason: "
-            await user.send(f"You just got banned from coding server! {optionals}{reason_for_ban}.",
+                reason_for_ban = "No reason provided."
+            await user.send(f"You just got banned from coding server! Reason: {reason_for_ban}.",
                             allowed_mentions=discord.AllowedMentions.none())
             await user.ban(reason=reason_for_ban, delete_message_days=days)
             embed = discord.Embed(title=f":white_check_mark: {user.name} has been banned.")
@@ -327,7 +321,7 @@ class Mod(commands.Cog):
         try:
             reason_for_unban = ' '.join(reason)
             if reason_for_unban == "":
-                reason_for_unban = "\u200c"
+                reason_for_unban = "No reason provided."
             #    optionals = ""
             # else:
             #    optionals = "\nReason: "
