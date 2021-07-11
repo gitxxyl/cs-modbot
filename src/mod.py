@@ -310,6 +310,9 @@ class Mod(commands.Cog):
         elif isinstance(err, commands.MemberNotFound):
             print('no member found')
             await ctx.send(err)
+        elif isinstance(err, commands.CommandError):
+            print("day must be an int")
+            await ctx.send("The number of days must be an int!")
 
     @commands.has_permissions(administrator=True)
     @commands.command(name='unban')
@@ -350,6 +353,8 @@ class Mod(commands.Cog):
                 "Action failed because the bot does not have permissions to ban members, "
                 "or bot is too low in role hierarchy. "
             )
+        except discord.NotFound:
+            await ctx.send('User does not exist.', delete_after=2)
         except discord.HTTPException:
             # await user.send('I tried to unban you but failed.')
             await ctx.send("ERROR: permissions missing.", delete_after=2)
@@ -358,8 +363,6 @@ class Mod(commands.Cog):
                 f"{user.display_name} in channel {ctx.channel.name}. "
                 "Action failed because of HTTPException. "
             )
-        except discord.NotFound:
-            await ctx.send('User does not exist.', delete_after=2)
 
     @unban.error
     async def unban_error(self, ctx, err):
@@ -373,9 +376,9 @@ class Mod(commands.Cog):
         if isinstance(err, commands.MissingPermissions):
             print("missing admin perms")
             await ctx.send("You don't have the permission to do this!")
-        elif isinstance(err, commands.MemberNotFound):
-            print('no member found')
-            await ctx.send(err)
+        elif isinstance(err, commands.CommandError):
+            print("user id must be an int")
+            await ctx.send("The user must be an id (int)!")
 
     # optional function to check if message author has admin perms
     # @staticmethod
