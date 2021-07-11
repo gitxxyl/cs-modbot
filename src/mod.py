@@ -335,7 +335,7 @@ class Mod(commands.Cog):
             # await user.send(f"You just got unbanned from coding server! {optionals}{reason_for_ban}.",
             #                 allowed_mentions=discord.AllowedMentions.none())
             user = await self.bot.fetch_user(user)
-            await ctx.guild.unban(user)
+            await ctx.guild.unban(user, reason=reason_for_unban)
             embed = discord.Embed(title=f":white_check_mark: {user.name} has been unbanned.")
             embed.add_field(name="Reason:", value=f"{reason_for_unban}", inline=False)
             await ctx.send(f"Unbanned {user.display_name}", embed=embed)
@@ -354,7 +354,7 @@ class Mod(commands.Cog):
                 "or bot is too low in role hierarchy. "
             )
         except discord.NotFound:
-            await ctx.send('User does not exist.', delete_after=2)
+            await ctx.send('User or ban does not exist.', delete_after=2)
         except discord.HTTPException:
             # await user.send('I tried to unban you but failed.')
             await ctx.send("ERROR: permissions missing.", delete_after=2)
@@ -379,6 +379,7 @@ class Mod(commands.Cog):
         elif isinstance(err, commands.CommandError):
             print("user id must be an int")
             await ctx.send("The user must be an id (int)!")
+        print(err)
 
     # optional function to check if message author has admin perms
     # @staticmethod
