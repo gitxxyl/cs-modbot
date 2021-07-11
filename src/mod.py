@@ -187,9 +187,9 @@ class Mod(commands.Cog):
     async def kick(self, ctx, user: discord.Member, *reason) -> None:
         """
         Kicks a user with an optional reason.
-        <user>: id/username of user to warn
+        <user>: id/username of user to kick
         === OPTIONAL ===
-        [reason]: reason for warn\n
+        [reason]: reason for kick\n
         |
         """
         try:
@@ -198,8 +198,8 @@ class Mod(commands.Cog):
                 reason_for_kick = "\u200c"
                 optionals = ""
             else:
-                optionals = " for "
-            await user.send(f"You just got kicked{optionals}{reason_for_kick}!",
+                optionals = "\nReason: "
+            await user.send(f"You just got kicked from coding server!{optionals}{reason_for_kick}!",
                             allowed_mentions=discord.AllowedMentions.none())
             await user.kick(reason=reason_for_kick)
             embed = discord.Embed(title=f":white_check_mark: {user.name} has been kicked.")
@@ -210,9 +210,7 @@ class Mod(commands.Cog):
                 f"{user.display_name} in channel {ctx.channel.name}. "
                 f"Reason: ```{reason_for_kick}```"
             )
-            await user.send(f"You just got kicked{optionals}{reason_for_kick}!",
-                            allowed_mentions=discord.AllowedMentions.none())
-        except discord.Forbidden as e:
+        except discord.Forbidden:
             await user.send('I tried to kick you but failed.')
             await ctx.send("ERROR: permissions missing.", delete_after=2)
             await self.bot.get_channel(MOD_CHANNEL).send(
@@ -232,6 +230,139 @@ class Mod(commands.Cog):
 
     @kick.error
     async def kick_error(self, ctx, err):
+        """
+        :param ctx:
+        :param err:
+        :return:
+        Deals with errors where user does not have admin permissions\n
+        |
+        """
+        if isinstance(err, commands.MissingPermissions):
+            print("missing admin perms")
+            await ctx.send("You don't have the permission to do this!")
+        elif isinstance(err, commands.MemberNotFound):
+            print('no member found')
+            await ctx.send(err)
+
+    @commands.has_permissions(administrator=True)
+    @commands.command(name='ban')
+    async def ban(self, ctx, user: discord.Member, days: int = 1, *reason) -> None:
+        """
+        Bans a user with an optional reason.
+        <user>: id/username of user to ban
+        === OPTIONAL ===
+        [reason]: reason for ban\n
+        [days]: The number of days worth of messages to delete from the user in the server.
+        The minimum is 0 and the maximum is 7.\n
+        |
+        """
+        try:
+            if days < 0 or days > 7:
+                await ctx.send('Days must be between 0 and 7.')
+                return
+            reason_for_ban = ' '.join(reason)
+            if reason_for_ban == "":
+                reason_for_ban = "\u200c"
+                optionals = ""
+            else:
+                optionals = "\nReason: "
+            await user.send(f"You just got banned from coding server! {optionals}{reason_for_ban}.",
+                            allowed_mentions=discord.AllowedMentions.none())
+            await user.ban(reason=reason_for_ban, delete_message_days=days)
+            embed = discord.Embed(title=f":white_check_mark: {user.name} has been banned.")
+            embed.add_field(name="Reason:", value=f"{reason_for_ban}", inline=False)
+            await ctx.send(f"Banned {user.display_name}", embed=embed)
+            await self.bot.get_channel(MOD_CHANNEL).send(
+                f"User {ctx.author.display_name} banned "
+                f"{user.display_name} in channel {ctx.channel.name}. "
+                f"Reason: ```{reason_for_ban}```"
+            )
+        except discord.Forbidden:
+            await user.send('I tried to ban you but failed.')
+            await ctx.send("ERROR: permissions missing.", delete_after=2)
+            await self.bot.get_channel(MOD_CHANNEL).send(
+                f"User {ctx.author.display_name} attempted to unban "
+                f"{user.display_name} in channel {ctx.channel.name}. "
+                "Action failed because the bot does not have permissions to ban members, "
+                "or bot is too low in role hierarchy. "
+            )
+        except discord.HTTPException:
+            await user.send('I tried to ban you but failed.')
+            await ctx.send("ERROR: permissions missing.", delete_after=2)
+            await self.bot.get_channel(MOD_CHANNEL).send(
+                f"User {ctx.author.display_name} attempted to unban "
+                f"{user.display_name} in channel {ctx.channel.name}. "
+                "Action failed because of HTTPException. "
+            )
+
+    @ban.error
+    async def ban_error(self, ctx, err):
+        """
+        :param ctx:
+        :param err:
+        :return:
+        Deals with errors where user does not have admin permissions\n
+        |
+        """
+        if isinstance(err, commands.MissingPermissions):
+            print("missing admin perms")
+            await ctx.send("You don't have the permission to do this!")
+        elif isinstance(err, commands.MemberNotFound):
+            print('no member found')
+            await ctx.send(err)
+
+    @commands.has_permissions(administrator=True)
+    @commands.command(name='unban')
+    async def unban(self, ctx, user: int, *reason) -> None:
+        """
+        Unbans a user with an optional reason.
+        <user>: id of user to unban
+        === OPTIONAL ===
+        [reason]: reason for unban\n
+        |
+        """
+        try:
+            reason_for_unban = ' '.join(reason)
+            if reason_for_unban == "":
+                reason_for_unban = "\u200c"
+            #    optionals = ""
+            # else:
+            #    optionals = "\nReason: "
+            # Cannot send messages if not in same server
+            # await user.send(f"You just got unbanned from coding server! {optionals}{reason_for_ban}.",
+            #                 allowed_mentions=discord.AllowedMentions.none())
+            user = await self.bot.fetch_user(user)
+            await ctx.guild.unban(user)
+            embed = discord.Embed(title=f":white_check_mark: {user.name} has been unbanned.")
+            embed.add_field(name="Reason:", value=f"{reason_for_unban}", inline=False)
+            await ctx.send(f"Unbanned {user.display_name}", embed=embed)
+            await self.bot.get_channel(MOD_CHANNEL).send(
+                f"User {ctx.author.display_name} unbanned "
+                f"{user.display_name} in channel {ctx.channel.name}. "
+                f"Reason: ```{reason_for_unban}```"
+            )
+        except discord.Forbidden:
+            # await user.send('I tried to unban you but failed.')
+            await ctx.send("ERROR: permissions missing.", delete_after=2)
+            await self.bot.get_channel(MOD_CHANNEL).send(
+                f"User {ctx.author.display_name} attempted to unban "
+                f"{user.display_name} in channel {ctx.channel.name}. "
+                "Action failed because the bot does not have permissions to ban members, "
+                "or bot is too low in role hierarchy. "
+            )
+        except discord.HTTPException:
+            # await user.send('I tried to unban you but failed.')
+            await ctx.send("ERROR: permissions missing.", delete_after=2)
+            await self.bot.get_channel(MOD_CHANNEL).send(
+                f"User {ctx.author.display_name} attempted to unban "
+                f"{user.display_name} in channel {ctx.channel.name}. "
+                "Action failed because of HTTPException. "
+            )
+        except discord.NotFound:
+            await ctx.send('User does not exist.', delete_after=2)
+
+    @unban.error
+    async def unban_error(self, ctx, err):
         """
         :param ctx:
         :param err:
