@@ -196,8 +196,12 @@ class Mod(commands.Cog):
             reason_for_kick = ' '.join(reason)
             if reason_for_kick == "":
                 reason_for_kick = "No reason provided."
-            await user.send(f"You just got kicked from coding server! Reason: {reason_for_kick}.",
-                            allowed_mentions=discord.AllowedMentions.none())
+            other = ""
+            try:
+                await user.send(f"You just got kicked from coding server! Reason: {reason_for_kick}",
+                                allowed_mentions=discord.AllowedMentions.none())
+            except discord.HTTPException:
+                other = "Could not dm user about kick."
             await user.kick(reason=reason_for_kick)
             embed = discord.Embed(title=f":white_check_mark: {user.name} has been kicked.")
             embed.add_field(name="Reason:", value=f"{reason_for_kick}", inline=False)
@@ -206,6 +210,7 @@ class Mod(commands.Cog):
                 f"User {ctx.author.display_name} kicked "
                 f"{user.display_name} in channel {ctx.channel.name}. "
                 f"Reason: ```{reason_for_kick}```"
+                f"{other}"
             )
         except discord.Forbidden:
             await user.send('I tried to kick you but failed.')
@@ -260,8 +265,12 @@ class Mod(commands.Cog):
             reason_for_ban = ' '.join(reason)
             if reason_for_ban == "":
                 reason_for_ban = "No reason provided."
-            await user.send(f"You just got banned from coding server! Reason: {reason_for_ban}.",
-                            allowed_mentions=discord.AllowedMentions.none())
+            other = ""
+            try:
+                await user.send(f"You just got banned from coding server! Reason: {reason_for_ban}",
+                                allowed_mentions=discord.AllowedMentions.none())
+            except discord.HTTPException:
+                other = "Could not dm user about ban."
             await user.ban(reason=reason_for_ban, delete_message_days=days)
             embed = discord.Embed(title=f":white_check_mark: {user.name} has been banned.")
             embed.add_field(name="Reason:", value=f"{reason_for_ban}", inline=False)
@@ -270,6 +279,7 @@ class Mod(commands.Cog):
                 f"User {ctx.author.display_name} banned "
                 f"{user.display_name} in channel {ctx.channel.name}. "
                 f"Reason: ```{reason_for_ban}```"
+                f"{other}"
             )
         except discord.Forbidden:
             await user.send('I tried to ban you but failed.')
